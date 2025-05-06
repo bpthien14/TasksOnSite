@@ -89,16 +89,16 @@ console.log(objectA.objectB.nestedProperty); // 'changedValue'
 console.log(objectB === objectA.objectB);    // true - cùng 
 
 - Giải Thích:
-    Cấu trúc bộ nhớ:
+Cấu trúc bộ nhớ:
 
-        objectA chứa một reference đến object gốc
-        Thuộc tính objectB của objectA chứa reference đến object lồng nhau
+objectA chứa một reference đến object gốc
+Thuộc tính objectB của objectA chứa reference đến object lồng nhau
 
-    Khi destructuring:
+Khi destructuring:
 
-        JavaScript tìm thuộc tính objectB trong objectA
-        Tạo biến mới objectB với cùng giá trị reference
-        Không có object mới nào được tạo ra
+JavaScript tìm thuộc tính objectB trong objectA
+Tạo biến mới objectB với cùng giá trị reference
+Không có object mới nào được tạo ra
 
 
 
