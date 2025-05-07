@@ -16,27 +16,27 @@
     console.log(1n == 1); // true (loose equality)
     console.log(1n === 1); // false (strict equality - khác kiểu)
 ## Lưu trữ: 
-    BigInts: Lưu trữ dưới dạng chuỗi các chữ số trong không gian bộ nhớ được cấp phát động.
-    Còn Numbers: Lưu trữ dưới dạng số thực dấu phẩy động độ chính xác kép IEEE-754 (64 bit)
+BigInts: Lưu trữ dưới dạng chuỗi các chữ số trong không gian bộ nhớ được cấp phát động.
+Còn Numbers: Lưu trữ dưới dạng số thực dấu phẩy động độ chính xác kép IEEE-754 (64 bit)
 
 ## Triển khai: 
-    Trong V8 (Chrome/Node.js):
+Trong V8 (Chrome/Node.js):
 
-        Biểu Diễn Nội Bộ: 
-            BigInts được lưu trữ dưới dạng:
-                Một bit dấu
-                Một mảng chữ số có độ dài thay đổi (thường là các khối 32-bit hoặc 64-bit)
-        Quản Lý Bộ Nhớ:
-            BigInts là các đối tượng được cấp phát trên heap
-            Engine thay đổi kích thước bộ nhớ một cách động khi cần thiết cho các phép tính
+    Biểu Diễn Nội Bộ: 
+        BigInts được lưu trữ dưới dạng:
+            Một bit dấu
+            Một mảng chữ số có độ dài thay đổi (thường là các khối 32-bit hoặc 64-bit)
+    Quản Lý Bộ Nhớ:
+        BigInts là các đối tượng được cấp phát trên heap
+        Engine thay đổi kích thước bộ nhớ một cách động khi cần thiết cho các phép tính
 ## Bên trong xử lí phép toán
-// Ví dụ phép cộng (biểu diễn khái niệm)
-function bigIntAdd(a, b) {
-// 1. Chuyển đổi thành biểu diễn mảng chữ số nội bộ
-// 2. Thực hiện thuật toán cộng cơ bản với nhớ
-// 3. Chuẩn hóa kết quả (loại bỏ số 0 đứng đầu)
-// 4. Tạo đối tượng BigInt mới với kết quả
-}
+    // Ví dụ phép cộng (biểu diễn khái niệm)
+    function bigIntAdd(a, b) {
+    // 1. Chuyển đổi thành biểu diễn mảng chữ số nội bộ
+    // 2. Thực hiện thuật toán cộng cơ bản với nhớ
+    // 3. Chuẩn hóa kết quả (loại bỏ số 0 đứng đầu)
+    // 4. Tạo đối tượng BigInt mới với kết quả
+    }
 ## Hiệu suất
 
 - Các phép toán BigInt chậm hơn phép toán Number
