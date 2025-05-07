@@ -75,24 +75,37 @@ function backToMainMenu() {
     });
 }
 
-
 // Hàm kiểm tra và chuẩn hóa dữ liệu đầu vào
 function validateStudentInput() {
     return new Promise((resolve) => {
         rl.question("Nhập tên: ", (name) => {
             // Chuẩn hóa tên
-            const normalizedName = name.trim().replace(/\s+/g, ' ');
-            
+            const normalizedName = name.trim().replace(/\s+/g, " ");
+
             if (normalizedName.length === 0) {
                 console.log("Tên không được để trống.");
                 resolve(null);
                 return;
             }
-            
+
+            // Kiểm tra dấu câu và ký tự đặc biệt
+            const nameRegex =
+                /^[A-Za-zÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/;
+
+            if (!nameRegex.test(normalizedName)) {
+                console.log(
+                    "Tên chỉ được chứa chữ cái và khoảng trắng, không được chứa dấu câu hoặc ký tự đặc biệt."
+                );
+                resolve(null);
+                return;
+            }
+
             rl.question("Nhập tuổi: ", (ageInput) => {
                 const age = parseInt(ageInput);
                 if (isNaN(age) || age <= 0) {
-                    console.log("Tuổi không hợp lệ. Vui lòng nhập một số dương.");
+                    console.log(
+                        "Tuổi không hợp lệ. Vui lòng nhập một số dương."
+                    );
                     resolve(null);
                     return;
                 }
@@ -100,7 +113,9 @@ function validateStudentInput() {
                 rl.question("Nhập điểm: ", (gradeInput) => {
                     const grade = parseFloat(gradeInput);
                     if (isNaN(grade) || grade < 0 || grade > 10) {
-                        console.log("Điểm không hợp lệ. Vui lòng nhập số từ 0-10.");
+                        console.log(
+                            "Điểm không hợp lệ. Vui lòng nhập số từ 0-10."
+                        );
                         resolve(null);
                         return;
                     }
@@ -108,7 +123,7 @@ function validateStudentInput() {
                     resolve({
                         name: normalizedName,
                         age,
-                        grade
+                        grade,
                     });
                 });
             });
