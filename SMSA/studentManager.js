@@ -28,8 +28,10 @@ function saveData(data) {
     try {
         const jsonData = JSON.stringify(data, null, 2);
         fs.writeFileSync(DATA_PATH, jsonData, 'utf8');
+        return true;
     } catch (error) {
         console.error('Error writing file:', error);
+        return false;
     }
 }
 
@@ -56,8 +58,8 @@ function addStudentToFile(name, age, grade) {
     const newStudent = new Student(id, name, age, grade);
 
     students.push(newStudent);
-    saveData(students);
-    console.log('New student added:', newStudent);
+    if (saveData(students))
+        console.log('New student added:', newStudent);
     return true;
 }
 
@@ -89,8 +91,8 @@ function addMultipleStudentsToFile(studentsList) {
 
     // Chỉ lưu nếu không có lỗi
     if (newStudents.length > 0) {
-        saveData(students);
-        console.log(`Đã thêm ${newStudents.length} sinh viên vào hệ thống.`);
+        if (saveData(students))
+            console.log(`Đã thêm ${newStudents.length} sinh viên vào hệ thống.`);
     } else if (errorsFound) {
         console.log('Không có sinh viên nào được thêm vào hệ thống do lỗi dữ liệu.');
     }
