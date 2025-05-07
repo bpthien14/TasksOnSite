@@ -76,6 +76,7 @@ function backToMainMenu() {
 // Hàm thêm sinh viên mới
 function addNewStudent() {
     rl.question('Nhập tên sinh viên: ', (name) => {
+        // Kiểm tra tên không được để trống 
         const trimmedName = name.trim();
         if (trimmedName.length === 0) {
             console.log('Tên không được để trống.');

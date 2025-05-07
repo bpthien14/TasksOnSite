@@ -112,5 +112,11 @@
     "name": "Thiện 2",
     "age": 14,
     "grade": 2.7
+  },
+  {
+    "id": 20,
+    "name": "Bùi Phước Thiện",
+    "age": 24,
+    "grade": 5.8
   }
 ]
