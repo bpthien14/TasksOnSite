@@ -76,6 +76,12 @@ function backToMainMenu() {
 // Hàm thêm sinh viên mới
 function addNewStudent() {
     rl.question('Nhập tên sinh viên: ', (name) => {
+        const trimmedName = name.trim();
+        if (trimmedName.length === 0) {
+            console.log('Tên không được để trống.');
+            backToMainMenu();
+            return;
+        }
         rl.question('Nhập tuổi: ', (ageInput) => {
             const age = parseInt(ageInput);
             if (isNaN(age)) {
