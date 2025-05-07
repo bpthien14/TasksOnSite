@@ -79,7 +79,7 @@ function backToMainMenu() {
 function validateStudentInput() {
     return new Promise((resolve) => {
         rl.question("Nhập tên: ", (name) => {
-            // Chuẩn hóa tên
+            // Chuẩn hóa tên, nhiều khoảng trắng thành một khoảng trắng và loại bỏ khoảng trắng đầu cuối
             const normalizedName = name.trim().replace(/\s+/g, " ");
 
             if (normalizedName.length === 0) {

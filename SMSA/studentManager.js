@@ -72,11 +72,6 @@ function addMultipleStudentsToFile(studentsList) {
     let errorsFound = false;
 
     studentsList.forEach((data) => {
-        // Đảm bảo rằng tên được trim trước khi validate
-        if (data.name) {
-            data.name = data.name.trim().replace(/\s+/g, " "); // Thay thế nhiều khoảng trắng bằng một khoảng trắng
-        }
-
         const errors = Student.validate(data);
 
         if (errors.length > 0) {
