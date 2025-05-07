@@ -75,77 +75,60 @@ function backToMainMenu() {
     });
 }
 
-// Hàm thêm sinh viên mới
-function addNewStudent() {
-    rl.question("Nhập tên sinh viên: ", (name) => {
-        // Kiểm tra tên không được để trống
-        const trimmedName = name.trim();
-        if (trimmedName.length === 0) {
-            console.log("Tên không được để trống.");
-            backToMainMenu();
-            return;
-        }
-        rl.question("Nhập tuổi: ", (ageInput) => {
-            const age = parseInt(ageInput);
-            if (isNaN(age)) {
-                console.log("Tuổi không hợp lệ. Vui lòng nhập một số.");
-                backToMainMenu();
-                return;
-            }
 
-            rl.question("Nhập điểm: ", (gradeInput) => {
-                const grade = parseFloat(gradeInput);
-                if (isNaN(grade)) {
-                    console.log("Điểm không hợp lệ. Vui lòng nhập một số.");
-                    backToMainMenu();
-                    return;
-                }
-
-                addStudentToFile(name, age, grade);
-                console.log("Sinh viên đã được thêm vào hệ thống.");
-                backToMainMenu();
-            });
-        });
-    });
-}
-
-// Hàm nhập thông tin một sinh viên
-function promptStudentInfo(index) {
+// Hàm kiểm tra và chuẩn hóa dữ liệu đầu vào
+function validateStudentInput() {
     return new Promise((resolve) => {
-        console.log(`\n--- Sinh viên thứ ${index} ---`);
         rl.question("Nhập tên: ", (name) => {
-            // Kiểm tra tên không được để trống
-            const trimmedName = name.trim();
-            if (trimmedName.length === 0) {
+            // Chuẩn hóa tên
+            const normalizedName = name.trim().replace(/\s+/g, ' ');
+            
+            if (normalizedName.length === 0) {
                 console.log("Tên không được để trống.");
-                backToMainMenu();
+                resolve(null);
                 return;
             }
+            
             rl.question("Nhập tuổi: ", (ageInput) => {
                 const age = parseInt(ageInput);
-                if (isNaN(age)) {
-                    console.log("Tuổi không hợp lệ. Vui lòng nhập một số.");
-                    backToMainMenu();
+                if (isNaN(age) || age <= 0) {
+                    console.log("Tuổi không hợp lệ. Vui lòng nhập một số dương.");
+                    resolve(null);
                     return;
                 }
 
                 rl.question("Nhập điểm: ", (gradeInput) => {
                     const grade = parseFloat(gradeInput);
-                    if (isNaN(grade)) {
-                        console.log("Điểm không hợp lệ. Vui lòng nhập một số.");
-                        backToMainMenu();
+                    if (isNaN(grade) || grade < 0 || grade > 10) {
+                        console.log("Điểm không hợp lệ. Vui lòng nhập số từ 0-10.");
+                        resolve(null);
                         return;
                     }
 
                     resolve({
-                        name,
+                        name: normalizedName,
                         age,
-                        grade,
+                        grade
                     });
                 });
             });
         });
     });
+}
+
+// Hàm thêm sinh viên mới
+async function addNewStudent() {
+    const student = await validateStudentInput();
+    if (student) {
+        addStudentToFile(student.name, student.age, student.grade);
+    }
+    backToMainMenu();
+}
+
+// Hàm nhập thông tin một sinh viên
+function promptStudentInfo(index) {
+    console.log(`\n--- Sinh viên thứ ${index} ---`);
+    return validateStudentInput();
 }
 
 // Hàm thêm nhiều sinh viên
@@ -173,7 +156,6 @@ function addMultipleStudents() {
         }
 
         addMultipleStudentsToFile(studentsList);
-        console.log(`Đã thêm ${studentsList.length} sinh viên vào hệ thống.`);
         backToMainMenu();
     });
 }

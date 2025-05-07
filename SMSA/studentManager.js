@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const Student = require('./models/Student.module');
 
 // Lấy đường dẫn tuyệt đối đến file data.json
 const DATA_PATH = path.join(__dirname, 'data.json');
@@ -42,17 +43,22 @@ function generateStudentId(students) {
 }
 
 function addStudentToFile(name, age, grade) {
+    const data = { name, age, grade };
+    const errors = Student.validate(data);
+
+    if (errors.length > 0) {
+        console.log('Lỗi:', errors.join(', '));
+        return false;
+    }
+
     let students = getStudents();
-    const newStudent = {
-        id: generateStudentId(students),
-        name,
-        age,
-        grade
-    };
+    const id = generateStudentId(students);
+    const newStudent = new Student(id, name, age, grade);
+
     students.push(newStudent);
-    // Lưu danh sách sinh viên vào file
     saveData(students);
     console.log('New student added:', newStudent);
+    return true;
 }
 
 function addMultipleStudentsToFile(studentsList) {
@@ -60,21 +66,37 @@ function addMultipleStudentsToFile(studentsList) {
 
     // Thêm từng sinh viên với ID riêng biệt
     const newStudents = [];
-    for (const student of studentsList) {
-        const newStudent = {
-            id: generateStudentId(students),
-            ...student
-        };
-        students.push(newStudent);
-        newStudents.push(newStudent);
-    }
+    let errorsFound = false;
 
-    // Lưu danh sách sinh viên vào file
-    saveData(students);
-    console.log('New students added:', newStudents);
+    studentsList.forEach(data => {
+        // Đảm bảo rằng tên được trim trước khi validate
+        if (data.name) {
+            data.name = data.name.trim().replace(/\s+/g, ' '); // Thay thế nhiều khoảng trắng bằng một khoảng trắng
+        }
+        
+        const errors = Student.validate(data);
+
+        if (errors.length > 0) {
+            console.log(`Lỗi khi thêm sinh viên ${data.name}:`, errors.join(', '));
+            errorsFound = true;
+        } else {
+            const id = generateStudentId(students);
+            const newStudent = new Student(id, data.name, data.age, data.grade);
+            students.push(newStudent);
+            newStudents.push(newStudent);
+        }
+    });
+
+    // Chỉ lưu nếu không có lỗi
+    if (newStudents.length > 0) {
+        saveData(students);
+        console.log(`Đã thêm ${newStudents.length} sinh viên vào hệ thống.`);
+    } else if (errorsFound) {
+        console.log('Không có sinh viên nào được thêm vào hệ thống do lỗi dữ liệu.');
+    }
+    
     return newStudents;
 }
-
 
 function displayStudents(students) {
     console.log('List of students:');
@@ -82,7 +104,6 @@ function displayStudents(students) {
         console.log(`ID: ${student.id}, Name: ${student.name}, Age: ${student.age}, Grade: ${student.grade}`);
     });
 }
-
 
 function displayTheListOfStudents() {
     const students = getStudents();
@@ -99,7 +120,6 @@ function findStudentsByName(name) {
 
 function displayFoundStudents(foundStudents) {
     if (foundStudents.length > 0) {
-        // console.log('Found students:');
         displayStudents(foundStudents);
     } else {
         console.log('No students found with that name.');
@@ -139,7 +159,7 @@ function getStudentClassification() {
     students.forEach(student => {
         if (student.grade >= 8) {
             classification.excellent++;
-        } else if (student.grade >= 6.5) {
+        } else if (student.grade >= 6.5 && student.grade < 8) {
             classification.good++;
         } else {
             classification.average++;
