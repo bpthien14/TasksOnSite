@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 class TeamOrganizer {
     constructor() {
         // Khởi tạo danh sách thành viên
@@ -160,6 +162,44 @@ class TeamOrganizer {
         return totalCombinations - invalidTeams.size;
     }
 
+    // Kiểm tra một đội cụ thể có hợp lệ không
+    checkTeamValidity(team) {
+        // Kiểm tra điều kiện cơ bản
+        const hasCore = team.some(id => this.allPlayers.find(p => p.id === id && p.type === 'core'));
+        const hasKey = team.some(id => this.allPlayers.find(p => p.id === id && p.type === 'key'));
+        const hasReserve = team.some(id => this.allPlayers.find(p => p.id === id && p.type === 'reserve'));
+        
+        if (!hasCore || !hasKey || !hasReserve) {
+            return false;
+        }
+        
+        // Kiểm tra số lượng
+        if (team.length !== 3) {
+            return false;
+        }
+        
+        // Kiểm tra ràng buộc "phải chơi cùng nhau"
+        for (const [id1, id2] of this.mustPlayTogether) {
+            const hasId1 = team.includes(id1);
+            const hasId2 = team.includes(id2);
+            
+            // Nếu một người được chọn nhưng người kia không được chọn
+            if (hasId1 !== hasId2) {
+                return false;
+            }
+        }
+        
+        // Kiểm tra ràng buộc "không thể chơi cùng nhau"
+        for (const [id1, id2] of this.cannotPlayTogether) {
+            // Nếu cả hai người đều được chọn
+            if (team.includes(id1) && team.includes(id2)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
     // Phương thức hiển thị kết quả đếm
     displayCount() {
         const count = this.countValidTeams();
@@ -167,17 +207,106 @@ class TeamOrganizer {
     }
 }
 
-// Khởi tạo và sử dụng
-const organizer = new TeamOrganizer();
+// Đọc dữ liệu từ file input với định dạng mới
+function readNewInputFormat(filePath, organizer) {
+    try {
+        const data = fs.readFileSync(filePath, 'utf8').trim();
+        const lines = data.split('\n'); // Tách dữ liệu thành các dòng
 
-// Ví dụ thêm ràng buộc
-//organizer.addMustPlayTogetherConstraint(0, 1); // Core Player và Key Player 1 phải chơi cùng nhau
-organizer.addCannotPlayTogetherConstraint(0, 1); // Core Player 1 và Key Player 1 không thể chơi cùng nhau
+        // Dòng đầu tiên chứa hai số n, m
+        const [n, m] = lines[0].split(' ').map(num => parseInt(num, 10));
+        if (isNaN(n) || isNaN(m)) {
+            throw new Error('Dữ liệu dòng đầu không hợp lệ (phải có hai số n, m).');
+        }
 
-// Hiển thị kết quả
-organizer.displayCount();
+        console.log(`Số lượng ràng buộc: ${n}, Số lượng tổ hợp đội cần kiểm tra: ${m}`);
 
-// HLV có thể thay đổi ràng buộc
-organizer.clearConstraints();
-// organizer.addMustPlayTogetherConstraint(4, 7);
-// organizer.displayResults();
+        // Xử lý n dòng ràng buộc
+        for (let i = 1; i <= n; i++) {
+            const [id1, id2, type] = lines[i].split(' '); // Tách ID và loại ràng buộc
+            const player1Id = parseInt(id1, 10);
+            const player2Id = parseInt(id2, 10);
+
+            if (isNaN(player1Id) || isNaN(player2Id)) {
+                throw new Error(`Ràng buộc dòng ${i} không hợp lệ.`);
+            }
+
+            if (type === 'must') {
+                organizer.addMustPlayTogetherConstraint(player1Id, player2Id);
+            } else if (type === 'cannot') {
+                organizer.addCannotPlayTogetherConstraint(player1Id, player2Id);
+            } else {
+                throw new Error(`Loại ràng buộc không hợp lệ tại dòng ${i}.`);
+            }
+        }
+
+        // Đọc m dòng tổ hợp đội cần kiểm tra
+        const teamsToCheck = [];
+        for (let i = n + 1; i <= n + m; i++) {
+            const teamMembers = lines[i].split(' ').map(id => parseInt(id, 10));
+            if (teamMembers.some(id => isNaN(id))) {
+                throw new Error(`Dữ liệu tổ hợp đội không hợp lệ tại dòng ${i}.`);
+            }
+            teamsToCheck.push(teamMembers);
+        }
+
+        console.log(`Đã đọc ${teamsToCheck.length} tổ hợp đội cần kiểm tra.`);
+
+        // Trả về kết quả đọc input
+        return {
+            constraintCount: n,
+            teamCount: m,
+            teamsToCheck
+        };
+    } catch (err) {
+        console.error(`Lỗi khi đọc file: ${err.message}`);
+        return null;
+    }
+}
+
+// Ghi dữ liệu ra file output
+function writeOutputToFile(filePath, data) {
+    try {
+        fs.writeFileSync(filePath, data, 'utf8');
+        console.log(`Kết quả đã được ghi vào file: ${filePath}`);
+    } catch (err) {
+        console.error(`Lỗi khi ghi file: ${err.message}`);
+    }
+}
+
+function processNewFormat(inputFilePath, outputFilePath) {
+    // Tạo đối tượng TeamOrganizer
+    const organizer = new TeamOrganizer();
+
+    // Đọc dữ liệu từ file input
+    const inputData = readNewInputFormat(inputFilePath, organizer);
+    if (!inputData) {
+        return false;
+    }
+
+    // Tính số lượng đội hợp lệ
+    const validTeamsCount = organizer.countValidTeams();
+
+    // Kiểm tra từng tổ hợp đội
+    const teamResults = inputData.teamsToCheck.map(team => {
+        const isValid = organizer.checkTeamValidity(team);
+        return isValid ? 'true' : 'false';
+    });
+
+    // Tạo nội dung output
+    let outputContent = `${validTeamsCount}\n`;
+    outputContent += teamResults.join('\n');
+
+    // Ghi kết quả ra file output
+    writeOutputToFile(outputFilePath, outputContent);
+    return true;
+}
+
+const inputFilePath = './input.txt';
+const outputFilePath = './output.txt';
+
+processNewFormat(inputFilePath, outputFilePath);
+
+
+
+
