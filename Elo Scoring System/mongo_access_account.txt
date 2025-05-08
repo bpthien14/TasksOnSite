@@ -1,0 +1,4 @@
+bpthien21
+G9NgKR2tsY0kkSeR
+
+mongodb+srv://bpthien21:G9NgKR2tsY0kkSeR@clustereloscoringsystem.xo2q84e.mongodb.net/?retryWrites=true&w=majority&appName=ClusterEloScoringSystem00
