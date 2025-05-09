@@ -191,6 +191,16 @@ a {
   color: var(--text-secondary);
 }
 
+.tier-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tier-icon {
+  margin-left: 4px;
+}
+
 .champions-cell {
   display: flex;
   gap: 4px;
