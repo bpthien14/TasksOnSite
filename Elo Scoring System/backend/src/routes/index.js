@@ -7,7 +7,7 @@ const statisticRoutes = require('./statistic.routes');
 
 const router = express.Router();
 
-// Định nghĩa các routes
+// Đăng ký các routes
 router.use('/players', playerRoutes);
 router.use('/matches', matchRoutes);
 router.use('/seasons', seasonRoutes);

@@ -3,39 +3,39 @@
 ## Giai đoạn 1: Thiết lập cơ sở hạ tầng và dữ liệu
 - [x] Phân tích yêu cầu hệ thống 
 - [x] Thiết kế cơ sở dữ liệu MongoDB
-- [ ] Thiết lập dự án Node.js với Express
-- [ ] Cấu hình kết nối MongoDB
-- [ ] Tạo các model schema cho từng collection
-- [ ] Tạo dữ liệu mẫu và script seed
-- [ ] Thiết kế API endpoints (RESTful)
+- [x] Thiết lập dự án Node.js với Express
+- [x] Cấu hình kết nối MongoDB
+- [x] Tạo các model schema cho từng collection
+- [x] Tạo dữ liệu mẫu và script seed
+- [x] Thiết kế API endpoints (RESTful)
 
 ## Giai đoạn 2: Phát triển logic nghiệp vụ cốt lõi
-- [ ] Triển khai thuật toán Elo
-- [ ] Xây dựng các service xử lý:
-  - [ ] PlayerService (quản lý người chơi)
-  - [ ] MatchService (quản lý trận đấu)
-  - [ ] EloService (tính toán và cập nhật điểm Elo)
-  - [ ] SeasonService (quản lý mùa giải)
-- [ ] Triển khai tính năng random và cân bằng đội
+- [x] Triển khai thuật toán Elo
+- [x] Xây dựng các service xử lý:
+  - [x] PlayerService (quản lý người chơi)
+  - [x] MatchService (quản lý trận đấu)
+  - [x] EloService (tính toán và cập nhật điểm Elo)
+  - [x] SeasonService (quản lý mùa giải)
+- [x] Triển khai tính năng random và cân bằng đội
 - [ ] Viết unit tests cho các thuật toán và nghiệp vụ cốt lõi
 
 ## Giai đoạn 3: Xây dựng REST API
-- [ ] Xây dựng các controllers:
-  - [ ] PlayerController
-  - [ ] MatchController
-  - [ ] SeasonController
-  - [ ] StatisticsController
-- [ ] Triển khai middleware (authentication, logging, validation)
+- [x] Xây dựng các controllers:
+  - [x] PlayerController
+  - [x] MatchController
+  - [x] SeasonController
+  - [x] StatisticsController
+- [ chưa làm authentication vs logging ] Triển khai middleware (authentication, logging, validation)
 - [ ] Viết tài liệu API với Swagger/OpenAPI
 - [ ] Cài đặt rate limiting và các biện pháp bảo mật
 
 ## Giai đoạn 4: Xây dựng Frontend
-- [ ] Thiết lập dự án React (hoặc Vue/Angular)
-- [ ] Xây dựng layout và navigation chung
-- [ ] Triển khai các màn hình:
-  - [ ] Màn hình chính/Bảng xếp hạng
-  - [ ] Màn hình chi tiết người chơi
-  - [ ] Màn hình thông tin trận đấu
+- [x] Thiết lập dự án React (hoặc Vue/Angular)
+- [x] Xây dựng layout và navigation chung
+- [x] Triển khai các màn hình:
+  - [x] Màn hình chính/Bảng xếp hạng
+  - [x] Màn hình chi tiết người chơi
+  - [x] Màn hình thông tin trận đấu
   - [ ] Màn hình quản lý hệ thống
 - [ ] Tích hợp biểu đồ và visualization với D3.js hoặc Chart.js
 - [ ] Triển khai state management

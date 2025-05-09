@@ -1,46 +1,29 @@
 // src/routes/season.routes.js
 const express = require('express');
+const seasonController = require('../controllers/season.controller');
+const { validate } = require('../middleware/validate');
+const seasonValidation = require('../validations/season.validation');
 const router = express.Router();
-// TODO: Thêm seasonController sau khi tạo
+
+// Lấy mùa giải đang hoạt động
+router.get('/active', seasonController.getActiveSeason);
 
 // Lấy danh sách mùa giải
-router.get('/', function(req, res) {
-  res.json({ message: 'GET danh sách mùa giải' });
-});
+router.get('/', validate(seasonValidation.getSeasons), seasonController.getSeasons);
 
 // Tạo mùa giải mới
-router.post('/', function(req, res) {
-  res.json({ message: 'POST tạo mùa giải mới' });
-});
+router.post('/', validate(seasonValidation.createSeason), seasonController.createSeason);
 
 // Lấy thông tin mùa giải theo ID
-router.get('/:seasonId', function(req, res) {
-  res.json({ message: `GET thông tin mùa giải ${req.params.seasonId}` });
-});
+router.get('/:seasonId', validate(seasonValidation.getSeason), seasonController.getSeason);
 
 // Cập nhật thông tin mùa giải
-router.put('/:seasonId', function(req, res) {
-  res.json({ message: `PUT cập nhật mùa giải ${req.params.seasonId}` });
-});
-
-// Lấy mùa giải hiện tại
-router.get('/active', function(req, res) {
-  res.json({ message: 'GET mùa giải đang hoạt động' });
-});
+router.put('/:seasonId', validate(seasonValidation.updateSeason), seasonController.updateSeason);
 
 // Kết thúc mùa giải
-router.post('/:seasonId/end', function(req, res) {
-  res.json({ message: `POST kết thúc mùa giải ${req.params.seasonId}` });
-});
-
-// Lấy bảng xếp hạng mùa giải
-router.get('/:seasonId/rankings', function(req, res) {
-  res.json({ message: `GET bảng xếp hạng mùa giải ${req.params.seasonId}` });
-});
+router.post('/:seasonId/end', validate(seasonValidation.endSeason), seasonController.endSeason);
 
 // Cập nhật cài đặt mùa giải
-router.put('/:seasonId/settings', function(req, res) {
-  res.json({ message: `PUT cập nhật cài đặt mùa giải ${req.params.seasonId}` });
-});
+router.put('/:seasonId/settings', validate(seasonValidation.updateSeasonSettings), seasonController.updateSeasonSettings);
 
 module.exports = router;

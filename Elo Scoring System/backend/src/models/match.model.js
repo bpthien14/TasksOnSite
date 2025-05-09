@@ -118,7 +118,8 @@ const matchSchema = mongoose.Schema(
     winnerTeamColor: {
       type: String,
       enum: ['blue', 'red'],
-      required: true
+      required: false,
+      default: null
     }
   },
   {
