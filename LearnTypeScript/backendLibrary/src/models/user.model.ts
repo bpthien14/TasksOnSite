@@ -34,18 +34,5 @@ const UserSchema: Schema = new Schema({
   loginHistory: { type: [LoginHistorySchema], default: [] }
 }, { timestamps: true });
 
-// Middleware để hash password trước khi lưu (ví dụ, nếu không dùng ở service layer)
-// UserSchema.pre<IUser>('save', async function (next) {
-//   if (!this.isModified('password') || !this.password) {
-//     return next();
-//   }
-//   try {
-//     const salt = await bcrypt.genSalt(10);
-//     this.password = await bcrypt.hash(this.password, salt);
-//     next();
-//   } catch (err: any) {
-//     next(err);
-//   }
-// });
 
 export default mongoose.model<IUser>('User', UserSchema);

@@ -1,46 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
-interface ICopy {
-  copyId: string;
-  acquisitionDate: Date;
-  status: 'Có sẵn' | 'Đang mượn' | 'Bảo trì' | 'Mất';
-  shelfLocation: string;
-  condition: string;
-  notes?: string;
-}
-
-interface IEmbeddedCategory {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-}
-
-interface IEmbeddedAuthor {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-}
-
-interface IEmbeddedPublisher {
-  _id: mongoose.Types.ObjectId;
-  name: string;
-}
-
-export interface IBook extends Document {
-  title: string;
-  isbn?: string;
-  publishedYear?: number;
-  language?: string;
-  pages?: number;
-  price?: number;
-  description?: string;
-  category: IEmbeddedCategory;
-  authors: IEmbeddedAuthor[];
-  publisher: IEmbeddedPublisher;
-  copies: ICopy[];
-  averageRating?: number;
-  totalRatings?: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { IBook } from '../types/book.types';
 
 const CategoryEmbeddedSchema = new Schema({
   _id: { type: Schema.Types.ObjectId, required: true },
