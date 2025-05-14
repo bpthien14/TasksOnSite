@@ -24,13 +24,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from "@/context/auth-context"
 
 export function LibrarySidebar() {
   const pathname = usePathname()
-  const [userRole] = useState("Administrator")
+  const { user, logout, isAuthenticated } = useAuth()
+  
+  const userRole = user?.role || "guest"
+  const userInitials = user?.username ? user.username.substring(0, 2).toUpperCase() : "LM"
+  const userName = user?.username || "Library User"
 
   const isActive = (path: string) => {
     return pathname === path
+  }
+
+  // Nếu chưa đăng nhập và không phải trang login, không hiện sidebar
+  if (!isAuthenticated && pathname !== '/login') {
+    return null
   }
 
   return (
@@ -92,7 +102,7 @@ export function LibrarySidebar() {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          {userRole === "Administrator" && (
+          {userRole === "admin" && (
             <SidebarMenuItem>
               <SidebarMenuButton asChild isActive={isActive("/settings")}>
                 <Link href="/settings">
@@ -110,10 +120,10 @@ export function LibrarySidebar() {
             <Button variant="ghost" className="w-full justify-start gap-2">
               <Avatar className="h-6 w-6">
                 <AvatarImage src="/placeholder-user.jpg" alt="User" />
-                <AvatarFallback>LM</AvatarFallback>
+                <AvatarFallback>{userInitials}</AvatarFallback>
               </Avatar>
               <div className="flex flex-col items-start text-sm">
-                <span className="font-medium">Library Admin</span>
+                <span className="font-medium">{userName}</span>
                 <span className="text-xs text-muted-foreground">{userRole}</span>
               </div>
             </Button>
@@ -125,7 +135,7 @@ export function LibrarySidebar() {
               <Settings className="mr-2 h-4 w-4" />
               <span>Profile Settings</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

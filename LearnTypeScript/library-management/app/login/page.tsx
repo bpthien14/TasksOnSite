@@ -1,8 +1,7 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -10,49 +9,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, Lock } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { api } from "@/lib/utils"
+import { useAuth } from "@/context/auth-context"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const { login, isLoading, isAuthenticated, error } = useAuth()
   const router = useRouter()
-  const { toast } = useToast()
+
+  // Nếu đã đăng nhập thì chuyển hướng về trang chủ
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/')
+    }
+  }, [isAuthenticated, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
-    
-    try {
-      const response = await api.auth.login(email, password)
-      const data = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Đăng nhập thất bại')
-      }
-      
-      // Lưu token vào localStorage
-      localStorage.setItem('token', data.token)
-      
-      // Thông báo thành công
-      toast({
-        title: "Đăng nhập thành công",
-        description: "Chào mừng bạn đến với hệ thống quản lý thư viện",
-      })
-      
-      // Chuyển hướng đến trang chính
-      router.push('/')
-    } catch (error) {
-      console.error('Lỗi đăng nhập:', error)
-      toast({
-        title: "Đăng nhập thất bại",
-        description: error instanceof Error ? error.message : "Đã xảy ra lỗi khi đăng nhập",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+    await login({ username, password })
   }
 
   return (
@@ -69,14 +43,19 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
+                {error}
+              </div>
+            )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="admin@library.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
                 disabled={isLoading}
               />
@@ -85,7 +64,7 @@ export default function LoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Quên mật khẩu?
                 </Link>
               </div>
               <Input
@@ -99,13 +78,13 @@ export default function LoginPage() {
             </div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               <Lock className="mr-2 h-4 w-4" />
-              {isLoading ? "Đang đăng nhập..." : "Sign In"}
+              {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-center text-sm text-muted-foreground">
-            <span>Staff access only. Contact your administrator for account issues.</span>
+            <span>Chỉ dành cho nhân viên. Liên hệ quản trị viên nếu có vấn đề về tài khoản.</span>
           </div>
         </CardFooter>
       </Card>
