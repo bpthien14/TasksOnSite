@@ -13,3 +13,6 @@ LearnTypeScript/backendLibrary/.env
 /Elo Scoring System/league-leaderboard/.next
 /Elo Scoring System/league-leaderboard/node_modules
 Elo Scoring System/league-leaderboard/.env.local
+*.gz
+/LibrarySystem/library-management/.next
+/LibrarySystem/library-management/node_modules
