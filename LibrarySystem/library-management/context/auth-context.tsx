@@ -39,7 +39,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setError(null);
     } catch (error) {
       console.error('Lỗi khi lấy thông tin người dùng:', error);
-      // Nếu token không hợp lệ, đăng xuất người dùng
       if (error instanceof ApiError && error.status === 401) {
         localStorage.removeItem('token');
         setUser(null);
@@ -99,7 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     } catch (error) {
       console.error('Lỗi đăng xuất:', error);
-      // Ngay cả khi có lỗi, vẫn xóa token và đăng xuất người dùng ở phía client
       localStorage.removeItem('token');
       setUser(null);
       router.push('/login');

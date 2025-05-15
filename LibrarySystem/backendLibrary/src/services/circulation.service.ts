@@ -33,7 +33,7 @@ export const getBorrowings = async (
       const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
       sortOption[sortField] = sortOrder;
     } else {
-      sortOption.borrowDate = -1; // Mặc định sắp xếp theo ngày mượn (mới nhất lên đầu)
+      sortOption.borrowDate = -1; 
     }
 
     const borrowings = await Borrowing.find(filters)
@@ -154,13 +154,11 @@ export const createBorrowing = async (
       }
     });
 
-    // Cập nhật trạng thái bản sao sách
     await Book.updateOne(
       { _id: book._id, "copies.copyId": copy.copyId },
       { $set: { "copies.$.status": 'Đang mượn' } }
     );
 
-    // Cập nhật thông tin mượn sách của độc giả
     await Member.findByIdAndUpdate(member._id, {
       $push: {
         currentBorrowings: {
@@ -174,7 +172,6 @@ export const createBorrowing = async (
       $set: { 'borrowingHistory.lastBorrowing': borrowDate }
     });
 
-    // Kiểm tra nếu có đặt trước sách này, cập nhật trạng thái
     await Reservation.updateMany(
       { 
         'member._id': member._id,
@@ -190,59 +187,49 @@ export const createBorrowing = async (
   }
 };
 
-// Trả sách
 export const returnBorrowing = async (
   id: string,
   returnData: BorrowingReturnDTO,
   staffId: string
 ) => {
   try {
-    // Kiểm tra phiếu mượn
     const borrowing = await Borrowing.findById(id);
     if (!borrowing) {
       throw new Error("Không tìm thấy phiếu mượn");
     }
 
-    // Kiểm tra trạng thái phiếu mượn
     if (borrowing.status === 'Đã trả') {
       throw new Error("Sách đã được trả");
     }
 
-    // Kiểm tra nhân viên
     const staff = await Staff.findById(staffId);
     if (!staff) {
       throw new Error("Không tìm thấy nhân viên");
     }
 
-    // Thiết lập ngày trả
     const returnDate = returnData.returnDate 
       ? new Date(returnData.returnDate) 
       : new Date();
     
-    // Kiểm tra quá hạn và tính tiền phạt
     let fineAmount = 0;
     let fineReason = '';
     let fineStatus = 'Không có';
     
     const dueDate = new Date(borrowing.dueDate);
     if (returnDate > dueDate) {
-      // Tính số ngày quá hạn
       const daysLate = Math.ceil(
         (returnDate.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24)
       );
       
-      // Tính tiền phạt (5.000 VND / ngày)
       fineAmount = daysLate * 5000;
       fineReason = `Trả sách trễ ${daysLate} ngày`;
       fineStatus = 'Chưa thanh toán';
       
-      // Cập nhật tổng số sách trả trễ của độc giả
       await Member.findByIdAndUpdate(borrowing.member._id, {
         $inc: { 'borrowingHistory.totalOverdue': 1 }
       });
     }
 
-    // Thêm tiền phạt do hư hỏng sách (nếu có)
     if (returnData.fine && returnData.fine.amount > 0) {
       fineAmount += returnData.fine.amount;
       fineReason += fineReason 
@@ -251,7 +238,6 @@ export const returnBorrowing = async (
       fineStatus = 'Chưa thanh toán';
     }
 
-    // Cập nhật phiếu mượn
     const updatedBorrowing = await Borrowing.findByIdAndUpdate(id, {
       $set: {
         returnDate,
@@ -272,7 +258,6 @@ export const returnBorrowing = async (
       }
     }, { new: true });
 
-    // Nếu có tiền phạt, tạo bản ghi phạt
     if (fineAmount > 0) {
       await Fine.create({
         member: {
@@ -292,7 +277,6 @@ export const returnBorrowing = async (
         status: 'Chưa thanh toán'
       });
 
-      // Cập nhật tiền phạt của độc giả
       await Member.findByIdAndUpdate(borrowing.member._id, {
         $inc: {
           'fines.totalAmount': fineAmount,
@@ -365,12 +349,10 @@ export const renewBorrowing = async (
     if (renewData.newDueDate) {
       newDueDate = new Date(renewData.newDueDate);
     } else {
-      // Tự động thêm 14 ngày vào hạn hiện tại
       newDueDate = new Date(borrowing.dueDate);
       newDueDate.setDate(newDueDate.getDate() + 14);
     }
 
-    // Cập nhật phiếu mượn
     const updatedBorrowing = await Borrowing.findByIdAndUpdate(id, {
       $set: {
         dueDate: newDueDate,
@@ -381,7 +363,6 @@ export const renewBorrowing = async (
       $inc: { renewalCount: 1 }
     }, { new: true });
 
-    // Cập nhật thông tin ngày hạn trong danh sách đang mượn của độc giả
     await Member.updateOne(
       { 
         _id: borrowing.member._id,
@@ -396,9 +377,7 @@ export const renewBorrowing = async (
   }
 };
 
-// ==================== RESERVATION SERVICES ====================
 
-// Lấy danh sách đặt trước
 export const getReservations = async (
   filters: Record<string, any>,
   options: PaginationOptions
@@ -407,23 +386,20 @@ export const getReservations = async (
     const { page, limit, sort } = options;
     const skip = (page - 1) * limit;
 
-    // Tạo object sắp xếp
     const sortOption: any = {};
     if (sort) {
       const sortOrder = sort.startsWith('-') ? -1 : 1;
       const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
       sortOption[sortField] = sortOrder;
     } else {
-      sortOption.reservationDate = -1; // Mặc định sắp xếp theo ngày đặt (mới nhất lên đầu)
+      sortOption.reservationDate = -1; 
     }
 
-    // Truy vấn đặt trước theo filter và phân trang
     const reservations = await Reservation.find(filters)
       .sort(sortOption)
       .skip(skip)
       .limit(limit);
 
-    // Đếm tổng số đặt trước theo filter
     const total = await Reservation.countDocuments(filters);
 
     return {
@@ -440,7 +416,6 @@ export const getReservations = async (
   }
 };
 
-// Lấy chi tiết đặt trước
 export const getReservationById = async (id: string) => {
   try {
     const reservation = await Reservation.findById(id);
@@ -450,39 +425,32 @@ export const getReservationById = async (id: string) => {
   }
 };
 
-// Tạo đơn đặt trước sách
 export const createReservation = async (
   reservationData: ReservationCreateDTO
 ) => {
   try {
-    // Kiểm tra độc giả
     const member = await Member.findById(reservationData.memberId);
     if (!member) {
       throw new Error("Không tìm thấy độc giả");
     }
 
-    // Kiểm tra trạng thái độc giả
     if (member.status !== 'Hoạt động') {
       throw new Error(`Độc giả hiện có trạng thái ${member.status}, không thể đặt trước sách`);
     }
 
-    // Kiểm tra thẻ thư viện hết hạn
     if (new Date(member.expiryDate) < new Date()) {
       throw new Error("Thẻ thư viện đã hết hạn");
     }
 
-    // Kiểm tra sách
     const book = await Book.findById(reservationData.bookId);
     if (!book) {
       throw new Error("Không tìm thấy sách");
     }
 
-    // Kiểm tra xem sách có bản sao nào không
     if (!book.copies || book.copies.length === 0) {
       throw new Error("Sách không có bản sao nào");
     }
 
-    // Kiểm tra xem độc giả đã đặt trước sách này chưa
     const existingReservation = await Reservation.findOne({
       'member._id': member._id,
       'book._id': book._id,
@@ -493,7 +461,6 @@ export const createReservation = async (
       throw new Error("Độc giả đã đặt trước sách này");
     }
 
-    // Kiểm tra xem độc giả có đang mượn sách này không
     const isBorrowing = member.currentBorrowings.some(
       item => item.bookTitle === book.title
     );
@@ -502,19 +469,16 @@ export const createReservation = async (
       throw new Error("Độc giả đang mượn sách này, không cần đặt trước");
     }
 
-    // Kiểm tra xem có bản sao nào có sẵn không
     const availableCopies = book.copies.filter(copy => copy.status === 'Có sẵn');
     
     if (availableCopies.length > 0) {
       throw new Error("Sách đang có sẵn, không cần đặt trước");
     }
 
-    // Thiết lập ngày đặt và ngày hết hạn
     const reservationDate = new Date();
     const expiryDate = new Date(reservationDate);
-    expiryDate.setDate(expiryDate.getDate() + 7); // Đặt trước có hiệu lực 7 ngày
+    expiryDate.setDate(expiryDate.getDate() + 7); 
     
-    // Tạo đơn đặt trước mới
     const newReservation = await Reservation.create({
       member: {
         _id: member._id,
@@ -538,20 +502,17 @@ export const createReservation = async (
   }
 };
 
-// Cập nhật trạng thái đặt trước
 export const updateReservationStatus = async (
   id: string,
   status: 'Đang chờ' | 'Đã nhận' | 'Đã hủy' | 'Hết hạn',
   notes?: string
 ) => {
   try {
-    // Kiểm tra đơn đặt trước
     const reservation = await Reservation.findById(id);
     if (!reservation) {
       throw new Error("Không tìm thấy đơn đặt trước");
     }
 
-    // Cập nhật trạng thái và ghi chú
     const updatedReservation = await Reservation.findByIdAndUpdate(id, {
       $set: {
         status,
@@ -567,21 +528,17 @@ export const updateReservationStatus = async (
   }
 };
 
-// Gửi thông báo cho đơn đặt trước
 export const sendReservationNotification = async (id: string) => {
   try {
-    // Kiểm tra đơn đặt trước
     const reservation = await Reservation.findById(id);
     if (!reservation) {
       throw new Error("Không tìm thấy đơn đặt trước");
     }
 
-    // Kiểm tra trạng thái đơn đặt trước
     if (reservation.status !== 'Đang chờ') {
       throw new Error(`Đơn đặt trước có trạng thái ${reservation.status}, không thể gửi thông báo`);
     }
 
-    // Cập nhật trạng thái thông báo
     const updatedReservation = await Reservation.findByIdAndUpdate(id, {
       $set: {
         notificationSent: true,
@@ -589,9 +546,6 @@ export const sendReservationNotification = async (id: string) => {
       }
     }, { new: true });
 
-    // Trong thực tế, bạn sẽ gửi email/SMS ở đây
-    // sendEmail(reservation.member.email, 'Sách đặt trước đã sẵn sàng', '...');
-    
     return updatedReservation;
   } catch (error) {
     throw error;

@@ -142,7 +142,6 @@ export const deleteBook = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
-// Tìm kiếm sách
 export const searchBooks = async (req: Request, res: Response): Promise<void> => {
   try {
     const { q, limit = 10 } = req.query;

@@ -16,7 +16,6 @@ const PublisherEmbeddedSchema = new Schema({
   name: { type: String, required: true }
 }, { _id: false });
 
-// Schema cho copies
 const CopySchema = new Schema({
   copyId: { type: String, required: true },
   acquisitionDate: { type: Date, default: Date.now },

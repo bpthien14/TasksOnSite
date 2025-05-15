@@ -1,7 +1,3 @@
-/**
- * API Client chính cho việc giao tiếp với backend
- */
-
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export interface ApiResponse<T = any> {
@@ -36,7 +32,7 @@ export class ApiError extends Error {
   }
 }
 
-const BASE_URL = '/api'; // Sử dụng Next.js API route proxies
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ||'localhost:4000/api';
 
 export async function apiClient<T = any>(
   endpoint: string,
@@ -69,13 +65,11 @@ export async function apiClient<T = any>(
     method,
     headers: fetchHeaders,
     body: body ? JSON.stringify(body) : undefined,
-    credentials: 'include', // Gửi cookies nếu có
+    credentials: 'include', 
   });
 
-  // Trả về raw response nếu cần
   if (rawResponse) return res as unknown as T;
 
-  // Xử lý lỗi
   if (!res.ok) {
     let errorData: ApiErrorResponse;
     try {
@@ -93,10 +87,8 @@ export async function apiClient<T = any>(
     );
   }
 
-  // Nếu không có nội dung trả về
   if (res.status === 204) return {} as T;
   
-  // Parse JSON response
   const data = await res.json();
   return data as T;
 }

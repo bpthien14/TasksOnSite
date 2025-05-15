@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import * as dashboardService from "../services/dashboard.service";
 
-/**
- * Lấy thống kê tổng quát cho dashboard
- */
 export const getDashboardStats = async (req: Request, res: Response): Promise<void> => {
   try {
     const stats = await dashboardService.getDashboardStats();
@@ -14,9 +11,6 @@ export const getDashboardStats = async (req: Request, res: Response): Promise<vo
   }
 };
 
-/**
- * Lấy danh sách hoạt động gần đây
- */
 export const getRecentActivities = async (req: Request, res: Response): Promise<void> => {
   try {
     const { limit = 10 } = req.query;
@@ -28,9 +22,6 @@ export const getRecentActivities = async (req: Request, res: Response): Promise<
   }
 };
 
-/**
- * Lấy thống kê mượn sách theo tháng
- */
 export const getMonthlyCheckouts = async (req: Request, res: Response): Promise<void> => {
   try {
     const { months = 6 } = req.query;
@@ -42,9 +33,6 @@ export const getMonthlyCheckouts = async (req: Request, res: Response): Promise<
   }
 };
 
-/**
- * Lấy thống kê thể loại sách phổ biến
- */
 export const getPopularGenres = async (req: Request, res: Response): Promise<void> => {
   try {
     const genres = await dashboardService.getPopularGenres();

@@ -12,24 +12,20 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
     
     const totalBorrowings = await Borrowing.countDocuments();
     
-    // Đếm số đặt trước đang hoạt động
     const activeReservations = await Reservation.countDocuments({ status: 'Đang chờ' });
     
-    // Đếm số sách quá hạn
     const today = new Date();
     const overdueItems = await Borrowing.countDocuments({
       status: 'Đang mượn',
       dueDate: { $lt: today }
     });
     
-    // Đếm số sách có sẵn
     const availableBooks = await Book.aggregate([
       { $unwind: "$copies" },
       { $match: { "copies.status": "Có sẵn" } },
       { $count: "count" }
     ]).then(result => result.length > 0 ? result[0].count : 0);
     
-    // Lấy sách phổ biến nhất (dựa trên số lần mượn)
     const popularBooks = await Borrowing.aggregate([
       { $group: { 
         _id: "$bookCopy.bookId", 
@@ -72,15 +68,11 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
   }
 };
 
-/**
- * Lấy danh sách hoạt động gần đây
- * @param limit Số lượng hoạt động trả về
- */
+
 export const getRecentActivities = async (limit: number = 10): Promise<RecentActivity[]> => {
   try {
     const activities: RecentActivity[] = [];
     
-    // Lấy phiếu mượn gần đây
     const recentBorrowings = await Borrowing.find({ status: 'Đang mượn' })
       .sort({ borrowDate: -1 })
       .limit(limit);
@@ -100,7 +92,6 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
       });
     });
     
-    // Lấy phiếu trả gần đây
     const recentReturns = await Borrowing.find({ status: 'Đã trả', returnDate: { $exists: true } })
       .sort({ returnDate: -1 })
       .limit(limit);
@@ -120,7 +111,6 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
       });
     });
     
-    // Lấy đặt trước gần đây
     const recentReservations = await Reservation.find({ status: 'Đang chờ' })
       .sort({ reservationDate: -1 })
       .limit(limit);
@@ -139,7 +129,6 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
       });
     });
     
-    // Lấy độc giả mới
     const recentMembers = await Member.find()
       .sort({ createdAt: -1 })
       .limit(limit);
@@ -156,7 +145,6 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
       });
     });
     
-    // Lấy sách mới
     const recentBooks = await Book.find()
       .sort({ createdAt: -1 })
       .limit(limit);
@@ -173,7 +161,6 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
       });
     });
     
-    // Sắp xếp theo thời gian và giới hạn số lượng
     return activities
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
       .slice(0, limit);
@@ -184,37 +171,29 @@ export const getRecentActivities = async (limit: number = 10): Promise<RecentAct
   }
 };
 
-/**
- * Lấy thống kê mượn sách theo tháng
- * @param months Số tháng cần lấy dữ liệu
- */
 export const getMonthlyCheckouts = async (months: number = 6): Promise<MonthlyCheckout[]> => {
   try {
     const result: MonthlyCheckout[] = [];
     const today = new Date();
     
-    // Tạo mảng các tháng cần lấy dữ liệu
     for (let i = 0; i < months; i++) {
       const date = new Date(today);
       date.setMonth(today.getMonth() - i);
       
       const year = date.getFullYear();
-      const month = date.getMonth() + 1; // Tháng bắt đầu từ 0
+      const month = date.getMonth() + 1; 
       
       const startDate = new Date(year, month - 1, 1);
       const endDate = new Date(year, month, 0);
       
-      // Đếm số lượng mượn trong tháng
       const checkouts = await Borrowing.countDocuments({
         borrowDate: { $gte: startDate, $lte: endDate }
       });
       
-      // Đếm số lượng trả trong tháng
       const returns = await Borrowing.countDocuments({
         returnDate: { $gte: startDate, $lte: endDate }
       });
       
-      // Format tên tháng
       const monthName = new Intl.DateTimeFormat('vi-VN', { month: 'long' }).format(date);
       
       result.push({
@@ -225,7 +204,6 @@ export const getMonthlyCheckouts = async (months: number = 6): Promise<MonthlyCh
       });
     }
     
-    // Sắp xếp theo thời gian tăng dần
     return result.reverse();
     
   } catch (error) {
@@ -234,39 +212,29 @@ export const getMonthlyCheckouts = async (months: number = 6): Promise<MonthlyCh
   }
 };
 
-/**
- * Lấy thống kê thể loại sách phổ biến
- */
+
 export const getPopularGenres = async (): Promise<PopularGenre[]> => {
   try {
-    // Tạo pipeline aggregate để lấy thể loại phổ biến nhất
     const popularGenres = await Borrowing.aggregate([
-      // Kết nối với bảng books để lấy thông tin thể loại
       { $lookup: {
         from: "books",
         localField: "bookCopy.bookId",
         foreignField: "_id",
         as: "bookDetails"
       }},
-      // Unwind để làm phẳng dữ liệu
       { $unwind: "$bookDetails" },
       { $unwind: "$bookDetails.categories" },
-      // Group theo id của thể loại
       { $group: {
         _id: "$bookDetails.categories._id",
         name: { $first: "$bookDetails.categories.name" },
         count: { $sum: 1 }
       }},
-      // Sắp xếp theo số lượng
       { $sort: { count: -1 } },
-      // Giới hạn chỉ lấy 6 thể loại phổ biến nhất
       { $limit: 6 }
     ]);
     
-    // Tính tổng số lượt mượn để tính phần trăm
     const totalBorrowings = popularGenres.reduce((sum, genre) => sum + genre.count, 0);
     
-    // Thêm trường phần trăm
     return popularGenres.map(genre => ({
       _id: genre._id.toString(),
       name: genre.name,

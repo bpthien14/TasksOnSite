@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { faker } from "@faker-js/faker/locale/vi";
 import { connectToDatabase } from "../utils/database";
 
-// Import các models
 import Author from "../models/author.model";
 import Category from "../models/category.model";
 import Publisher from "../models/publisher.model";
@@ -18,7 +17,6 @@ import Fine from "../models/fine.model";
 
 dotenv.config();
 
-// Cấu hình số lượng records
 const AUTHOR_COUNT = 100;
 const CATEGORY_COUNT = 30;
 const PUBLISHER_COUNT = 50;

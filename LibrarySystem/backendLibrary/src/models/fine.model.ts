@@ -20,7 +20,7 @@ interface IEmbeddedStaffInfo {
 
 export interface IFine extends Document {
   member: IEmbeddedUserInfo;
-  borrowing: mongoose.Types.ObjectId; // Reference to the Borrowing document
+  borrowing: mongoose.Types.ObjectId; 
   book: IEmbeddedBookDetails;
   amount: number;
   reason: string;
@@ -33,8 +33,8 @@ export interface IFine extends Document {
 }
 
 const EmbeddedUserInfoSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // Link to User
-  memberId: { type: String, required: true }, // Assuming memberId for display
+  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
+  memberId: { type: String, required: true }, 
   fullName: { type: String, required: true }
 }, { _id: false });
 

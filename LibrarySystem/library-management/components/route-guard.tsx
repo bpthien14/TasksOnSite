@@ -8,7 +8,6 @@ interface RouteGuardProps {
   children: React.ReactNode
 }
 
-// Các đường dẫn công khai, không cần đăng nhập
 const publicPaths = ['/login', '/forgot-password', '/reset-password']
 
 export function RouteGuard({ children }: RouteGuardProps) {
@@ -18,18 +17,15 @@ export function RouteGuard({ children }: RouteGuardProps) {
 
   useEffect(() => {
     if (!isLoading) {
-      // Nếu không đăng nhập và không ở trang công khai, chuyển hướng về trang đăng nhập
       if (!isAuthenticated && !publicPaths.includes(pathname)) {
         router.push('/login')
       }
-      // Nếu đã đăng nhập và đang ở trang đăng nhập, chuyển hướng về trang chủ
       else if (isAuthenticated && pathname === '/login') {
         router.push('/')
       }
     }
   }, [isAuthenticated, isLoading, pathname, router])
 
-  // Nếu đang kiểm tra trạng thái xác thực, hiển thị loading...
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -41,7 +37,6 @@ export function RouteGuard({ children }: RouteGuardProps) {
     )
   }
 
-  // Nếu không đăng nhập và không ở trang công khai, không hiển thị nội dung
   if (!isAuthenticated && !publicPaths.includes(pathname)) {
     return null
   }

@@ -85,7 +85,6 @@ export const createMember = async (req: Request, res: Response): Promise<void> =
   }
 };
 
-// Cập nhật thông tin độc giả
 export const updateMember = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

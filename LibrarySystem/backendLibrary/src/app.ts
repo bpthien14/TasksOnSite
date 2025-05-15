@@ -11,9 +11,8 @@ import dashboardRoutes from "./routes/dashboard.route";
 const app = express();
 const PORT = config.server.port;
 
-// Cấu hình CORS
 app.use(cors({
-  origin: 'http://localhost:3000', // Địa chỉ của frontend
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 

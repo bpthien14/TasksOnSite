@@ -48,7 +48,7 @@ export interface BorrowingCreateDTO {
 
 export interface BorrowingReturnDTO {
   returnDate?: Date | string;
-  condition?: string; // Tình trạng sách khi trả
+  condition?: string; 
   fine?: {
     amount: number;
     reason?: string;
@@ -57,11 +57,10 @@ export interface BorrowingReturnDTO {
 }
 
 export interface BorrowingRenewDTO {
-  newDueDate?: Date | string; // Nếu không cung cấp, sẽ tự động thêm 14 ngày
+  newDueDate?: Date | string; 
   notes?: string;
 }
 
-// Interface cho Reservation
 export interface IReservation extends Document {
   member: {
     _id: Types.ObjectId;

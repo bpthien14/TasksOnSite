@@ -7,7 +7,7 @@ interface IEmbeddedBookInfoReview {
 
 interface IEmbeddedMemberInfoReview {
   _id: mongoose.Types.ObjectId;
-  memberId: string; // Assuming memberId for display
+  memberId: string;  
   fullName: string;
 }
 
@@ -29,8 +29,8 @@ const EmbeddedBookInfoReviewSchema = new Schema({
 }, { _id: false });
 
 const EmbeddedMemberInfoReviewSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // Link to User
-  memberId: { type: String, required: true }, // Assuming memberId for display
+  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
+  memberId: { type: String, required: true }, 
   fullName: { type: String, required: true }
 }, { _id: false });
 

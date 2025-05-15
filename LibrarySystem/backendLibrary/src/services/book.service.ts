@@ -53,7 +53,6 @@ export const getBooks = async (
   }
 };
 
-// Lấy chi tiết một cuốn sách
 export const getBookById = async (id: string) => {
   try {
     const book = await Book.findById(id);
@@ -63,12 +62,10 @@ export const getBookById = async (id: string) => {
   }
 };
 
-// Thêm sách mới
 export const createBook = async (bookData: Partial<IBook>) => {
   try {
     const newBook = await Book.create(bookData);
     
-    // Cập nhật số lượng sách cho tác giả
     if (bookData.authors && bookData.authors.length > 0) {
       for (const author of bookData.authors) {
         await Author.findByIdAndUpdate(
@@ -84,18 +81,14 @@ export const createBook = async (bookData: Partial<IBook>) => {
   }
 };
 
-// Cập nhật thông tin sách
 export const updateBook = async (id: string, bookData: Partial<IBook>) => {
   try {
-    // Kiểm tra sách tồn tại
     const existingBook = await Book.findById(id);
     if (!existingBook) {
       return null;
     }
     
-    // Cập nhật số lượng sách của tác giả nếu có thay đổi tác giả
     if (bookData.authors && JSON.stringify(existingBook.authors) !== JSON.stringify(bookData.authors)) {
-      // Giảm số lượng sách của các tác giả cũ
       if (existingBook.authors && existingBook.authors.length > 0) {
         for (const author of existingBook.authors) {
           await Author.findByIdAndUpdate(
@@ -105,7 +98,6 @@ export const updateBook = async (id: string, bookData: Partial<IBook>) => {
         }
       }
       
-      // Tăng số lượng sách của các tác giả mới
       if (bookData.authors.length > 0) {
         for (const author of bookData.authors) {
           await Author.findByIdAndUpdate(
@@ -116,7 +108,6 @@ export const updateBook = async (id: string, bookData: Partial<IBook>) => {
       }
     }
     
-    // Cập nhật thông tin sách
     const updatedBook = await Book.findByIdAndUpdate(
       id,
       { $set: bookData },
@@ -129,16 +120,13 @@ export const updateBook = async (id: string, bookData: Partial<IBook>) => {
   }
 };
 
-// Kiểm tra xem có thể xóa sách không
 export const canDeleteBook = async (id: string): Promise<DeleteResult> => {
   try {
-    // Kiểm tra xem có bản sao nào đang được mượn không
     const book = await Book.findById(id);
     if (!book) {
       return { ok: false, message: "Không tìm thấy sách" };
     }
     
-    // Kiểm tra xem có bản sao nào đang được mượn không
     const hasBorrowedCopies = book.copies.some(copy => copy.status === 'Đang mượn');
     if (hasBorrowedCopies) {
       return { 
@@ -147,7 +135,6 @@ export const canDeleteBook = async (id: string): Promise<DeleteResult> => {
       };
     }
     
-    // Kiểm tra xem có lịch sử mượn không
     const hasBorrowingHistory = await Borrowing.exists({ 'bookCopy.bookId': id });
     if (hasBorrowingHistory) {
       return { 
@@ -162,13 +149,11 @@ export const canDeleteBook = async (id: string): Promise<DeleteResult> => {
   }
 };
 
-// Xóa sách
 export const deleteBook = async (id: string) => {
   try {
     const book = await Book.findById(id);
     if (!book) return null;
     
-    // Cập nhật số lượng sách của tác giả
     if (book.authors && book.authors.length > 0) {
       for (const author of book.authors) {
         await Author.findByIdAndUpdate(
@@ -185,10 +170,8 @@ export const deleteBook = async (id: string) => {
   }
 };
 
-// Tìm kiếm sách
 export const searchBooks = async (query: string, limit: number = 10) => {
   try {
-    // Tìm kiếm theo tiêu đề, tác giả, ISBN, danh mục
     const books = await Book.find({
       $or: [
         { title: { $regex: query, $options: 'i' } },

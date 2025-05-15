@@ -36,7 +36,6 @@ export interface IMember extends Document {
   updatedAt: Date;
 }
 
-// DTO (Data Transfer Object) cho tạo/cập nhật thành viên
 export interface MemberDTO {
   memberId?: string;
   fullName: string;
@@ -49,7 +48,6 @@ export interface MemberDTO {
   status?: 'Hoạt động' | 'Tạm khóa' | 'Hết hạn';
 }
 
-// Kết quả trả về sau khi tìm kiếm
 export interface MemberSearchResult {
   members: IMember[];
   pagination: {

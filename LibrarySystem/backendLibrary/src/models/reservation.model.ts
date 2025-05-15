@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from 'mongoose';
 
 interface IEmbeddedUser {
   _id: mongoose.Types.ObjectId;
-  memberId: string; // Assuming memberId is used for display
+  memberId: string;
   fullName: string;
 }
 
@@ -25,7 +25,7 @@ export interface IReservation extends Document {
 }
 
 const EmbeddedUserSchema = new Schema({
-  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // Link to User model
+  _id: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
   memberId: { type: String, required: true },
   fullName: { type: String, required: true }
 }, { _id: false });

@@ -38,7 +38,6 @@ export function LibrarySidebar() {
     return pathname === path
   }
 
-  // Nếu chưa đăng nhập và không phải trang login, không hiện sidebar
   if (!isAuthenticated && pathname !== '/login') {
     return null
   }

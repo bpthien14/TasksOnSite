@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import * as circulationService from "../services/circulation.service";
 
-// ==================== BORROWING CONTROLLERS ====================
-
-// Lấy danh sách phiếu mượn
 export const getBorrowings = async (req: Request, res: Response): Promise<void> => {
   try {
     const { 

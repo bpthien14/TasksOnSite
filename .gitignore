@@ -17,3 +17,4 @@ Elo Scoring System/league-leaderboard/next-env.d.ts
 *.gz
 /LearnTypeScript/library-management/.next
 /LearnTypeScript/library-management/node_modules
+/LibrarySystem/backendLibrary/node_modules
